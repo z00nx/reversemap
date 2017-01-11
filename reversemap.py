@@ -53,6 +53,16 @@ def deobfuscate(input):
     casts = re.findall(r'(CAST\(0x((?:[0-9a-fA-F]{2})*) AS char\))', decodedurl, flags=re.IGNORECASE)
     for cast in casts:
         decodedurl = decodedurl.replace(cast[0], cast[1].decode('hex'))
+    '''
+    # Extract all substrings entries, decode and replace the original entry
+    substrings = re.findall(r'(SUBSTRING\(\(?([^,]+)\)?,(\d+),(\d+)\))', decodedurl, flags=re.IGNORECASE)
+    for substring in substrings:
+        (encodedsubstring, expression, start, length) = substring
+        start = int(start) - 1
+        length = int(length)
+        decodedsubstring = expression[start:length]
+        decodedurl = decodedurl.replace(encodedsubstring, decodedsubstring)
+    '''
 
     return(decodedurl)
 
