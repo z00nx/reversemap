@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Purpose: Analyse SQL injection attempts in web server logs
-# Execution: python reversemap.py [-h] [[-f FILE] [-o OUTPUT] | [-i]]
+# Execution: python reversemap.py [-h] [[-f FILE] [-o OUTPUT] | [-i]] [-e]
 # TODO: Add python3 compatibility
 # TODO: Recursive deobfuscation
 # TODO: Add deobfuscation for other obfuscation techniques
@@ -20,6 +20,7 @@ parser = argparse.ArgumentParser(description='Analyse SQL injection attempts in 
 parser.add_argument('-f', '--file', type=argparse.FileType('r'), help='Input file to process')
 parser.add_argument('-o', '--output', type=argparse.FileType('w'), help='Output file to write to')
 parser.add_argument('-i', '--interactive', action='store_true', help='Run interactively')
+parser.add_argument('-e', '--experimental', action='store_true', help='Enable experimental deobfuscation techniques(Substring)')
 args = parser.parse_args()
 
 banner = '''
@@ -52,16 +53,16 @@ def deobfuscate(input):
     casts = re.findall(r'(CAST\(0x((?:[0-9a-fA-F]{2})*) AS char\))', decodedurl, flags=re.IGNORECASE)
     for cast in casts:
         decodedurl = decodedurl.replace(cast[0], cast[1].decode('hex'))
-    '''
-    # Extract all substrings entries, decode and replace the original entry
-    substrings = re.findall(r'(SUBSTRING\(\(?([^,]+)\)?,(\d+),(\d+)\))', decodedurl, flags=re.IGNORECASE)
-    for substring in substrings:
-        (encodedsubstring, expression, start, length) = substring
-        start = int(start) - 1
-        length = int(length)
-        decodedsubstring = expression[start:length]
-        decodedurl = decodedurl.replace(encodedsubstring, decodedsubstring)
-    '''
+
+    if args.experimental:
+        # Extract all substrings entries, decode and replace the original entry
+        substrings = re.findall(r'(SUBSTRING\(\(?([^,]+)\)?,(\d+),(\d+)\))', decodedurl, flags=re.IGNORECASE)
+        for substring in substrings:
+            (encodedsubstring, expression, start, length) = substring
+            start = int(start) - 1
+            length = int(length)
+            decodedsubstring = expression[start:length]
+            decodedurl = decodedurl.replace(encodedsubstring, decodedsubstring)
 
     return(decodedurl)
 
