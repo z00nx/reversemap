@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # Purpose: Analyse SQL injection attempts in web server logs
 # Execution: python reversemap.py [-h] [[-f FILE] [-o OUTPUT] | [-i]]
-# Changelog:
 # TODO: Add python3 compatibility
 # TODO: Recursive deobfuscation
 # TODO: Add deobfuscation for other obfuscation techniques
