@@ -9,5 +9,6 @@ The program can deobfuscate the following obfuscation techniques:
 * SQL CHAR encoding
 * SQL CAST encoding
 * Case encoding of SQL keywords
+* Substring(Disabled as it will fail with nested queries)
 
 Pull requests, patches and feedback is welcome.
