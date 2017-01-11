@@ -35,10 +35,12 @@ def deobfuscate(input):
     decodedurl = urllib.unquote_plus(input)
     # Remove SQL comments
     decodedurl = decodedurl.replace('/**/', '')
+
     # Replace all sql keywords which maybe case obfuscated
     for sqlkeyword in sqlkeywords:
         unescapedsqlkeyword = sqlkeyword.replace('\\', '')
         decodedurl = re.sub(sqlkeyword, unescapedsqlkeyword, decodedurl, count=0, flags=re.IGNORECASE)
+
     # Extract all char encoded entries, decode and replace the original entry
     chars = re.findall(r'(CHAR\((\d{1,3}(,\d{1,3})*)\)\+?)', decodedurl)
     for char in chars:
@@ -46,10 +48,12 @@ def deobfuscate(input):
         for encodedchar in char[1].split(','):
             decodedchar += chr(int(encodedchar))
         decodedurl = decodedurl.replace(char[0], decodedchar)
+
     # Extract all cast obfuscated entries, decode and replace the original entry
-    casts = re.findall(r'(CAST\(0x((?:[0-9a-fA-F]{2})*) AS char\))', decodedurl)
+    casts = re.findall(r'(CAST\(0x((?:[0-9a-fA-F]{2})*) AS char\))', decodedurl, flags=re.IGNORECASE)
     for cast in casts:
         decodedurl = decodedurl.replace(cast[0], cast[1].decode('hex'))
+
     return(decodedurl)
 
 if __name__ == "__main__":
